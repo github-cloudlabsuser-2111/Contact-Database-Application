@@ -4,23 +4,21 @@
   "parameters": {
     "webAppName": {
       "type": "string",
-      "defaultValue": "ContactDatabaseWebApp",
       "metadata": {
-        "description": "Name for the Web App"
+        "description": "Name of the Web App"
       }
     },
-    "hostingPlanName": {
+    "appServicePlanName": {
       "type": "string",
-      "defaultValue": "ContactDatabaseServicePlan",
       "metadata": {
-        "description": "Name for the App Service plan"
+        "description": "Name of the App Service Plan"
       }
     },
-    "skuName": {
+    "location": {
       "type": "string",
-      "defaultValue": "F1",
+      "defaultValue": "[resourceGroup().location]",
       "metadata": {
-        "description": "The SKU of App Service Plan"
+        "description": "Location for all resources."
       }
     }
   },
@@ -28,25 +26,27 @@
     {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2020-06-01",
-      "name": "[parameters('hostingPlanName')]",
-      "location": "[resourceGroup().location]",
+      "name": "[parameters('appServicePlanName')]",
+      "location": "[parameters('location')]",
       "sku": {
-        "name": "[parameters('skuName')]"
+        "name": "F1",
+        "tier": "Free"
       },
       "properties": {
-        "name": "[parameters('hostingPlanName')]"
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0
       }
     },
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2020-06-01",
       "name": "[parameters('webAppName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
       }
     }
   ]
